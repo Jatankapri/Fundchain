@@ -1,0 +1,45 @@
+.heading {
+  margin-left: 40%;
+}
+
+.main {
+  font-weight: bold;
+  justify-content: center;
+  padding: 10px;
+  margin-left: 40%;
+  margin-top: 20px;
+  font-size: large;
+  width: 25%;
+  height: 780px;
+  border: 1px solid none;
+  border-radius: 20px;
+  box-shadow: 5px 10px 8px 10px #888888;
+  /* background: aliceblue; */
+}
+
+.box {
+  width: 250px;
+  height: 30px;
+}
+
+.reset {
+  font-size: 18px;
+  background: grey;
+  color: white;
+  padding: 15px;
+  font-weight: bold;
+  border: 1px solid white;
+  cursor: pointer;
+  border-radius: 20%;
+}
+
+.create {
+  font-size: 18px;
+  background: blue;
+  color: white;
+  padding: 10px;
+  border: 1px solid white;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bolder;
+}

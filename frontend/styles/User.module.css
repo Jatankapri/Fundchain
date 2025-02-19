@@ -1,0 +1,39 @@
+.main{
+    padding:10px;
+}
+
+.heading{
+    margin-left: 43%;
+    font-weight: bold;
+    font-size: 40px;
+}
+
+.body{
+   margin-left: 10%; 
+   font-size: x-large;
+}
+
+.image{
+    border:1px solid black;
+}
+
+.paragraph{
+    font-size: x-large;
+}
+
+.donate{
+    display: flex;
+    justify-content: space-between;
+}
+
+.sideInfo{
+    margin-left: 20px;
+    font-size: x-large;
+    margin-right: 5%;
+}
+
+.line{
+    margin-top: 2%;
+    border:1px solid grey;
+  
+}

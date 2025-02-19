@@ -1,0 +1,42 @@
+.main {
+  height: 130px;
+  top: -20px;
+  background: blue;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.heading {
+  font-size: 50px;
+  font-weight: bold;
+  top: 30px;
+}
+
+.option {
+  margin-top: 4%;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-around;
+  padding-left: 10px;
+}
+
+.trigger {
+  margin-top: 4%;
+  font-size: 18px;
+  display: flex;
+  justify-content: space-around;
+  padding-left: 10px;
+}
+
+.option:hover {
+  font-weight: bold;
+  color: blue;
+  text-decoration: underline;
+  font-size: 18px;
+}
+
+.button {
+  margin-top: 4%;
+  margin-right: 1%;
+}

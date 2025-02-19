@@ -1,0 +1,17 @@
+.button{
+    font-size: 18px;
+    font-weight: bold;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    padding: 8px;
+    background-color: #333399;
+    color:white;
+    border-radius: 8px;
+    border:1px solid whitesmoke;
+    margin-left: 680px;
+}
+
+.button:hover{
+    background: rgb(88, 8, 8);
+    color:white;
+    cursor: pointer;
+}

@@ -1,0 +1,79 @@
+.navbar {
+  border: 1px solid none;
+  background: white;
+  height: 80px;
+  display: flex;
+  justify-content: space-around;
+  margin-top: -3%;
+  margin-left: -8%;
+}
+
+.main {
+  background: whitesmoke;
+}
+
+.center {
+  margin-left: 7%;
+}
+
+.heading {
+  color: blue;
+}
+
+.line {
+  width: 50%;
+  margin-top: -39%;
+  border-top: 2px solid pink;
+}
+
+.font {
+  font-size: 18px;
+}
+
+.detail {
+  height: 500px;
+  background: white;
+  width: 850px;
+  border: 1px solid none;
+  box-shadow: 5px 10px 8px #888888;
+  padding: 20px;
+}
+
+.image {
+  margin-left: 120px;
+  margin-top: -42px;
+}
+
+.donationlog {
+  width: 700px;
+  border: 1px solid none;
+  padding: 20px;
+}
+
+.target {
+  padding: 8px;
+  font-weight: bold;
+  background: skyblue;
+  border: 1px solid none;
+  margin-top: -15px;
+  margin-left: 230px;
+}
+
+.sidediv {
+  padding: 10px;
+  top: 12px;
+  height: 600px;
+  width: 30%;
+  margin-left: 55%;
+}
+
+.donationdiv {
+  padding: 10px;
+  margin-left: 23%;
+  margin-top: -150px;
+}
+
+.donation {
+  padding: 8px;
+  font-weight: bold;
+}

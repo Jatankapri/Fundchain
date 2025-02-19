@@ -1,0 +1,54 @@
+.head{
+    display:flex;
+}
+
+.heading{
+    font-size:48px;
+    font-weight:bold;
+    margin-top:3%;
+}
+
+.body{
+    padding:10px;
+}
+
+.navbar{
+    height: 150px;
+    background: pink;
+    display: flex;
+    justify-content: space-around;
+}
+
+.option{
+    margin-top: 4%;
+    text-decoration: none;
+    font-size: 18px;
+    /* margin-right: -6%; */
+}
+
+.input{
+    height: 25px;
+    width: 25%;
+    font-size: 16px;
+}
+
+.button{
+    padding:8px;
+    color: white;
+    background: blue;
+    margin-top:2px;
+    border: 1px solid white;
+    cursor: pointer;
+    font-size: 18px;
+    border-radius:8px;
+}
+
+.reset{
+    color:white;
+    background: grey;
+    padding:6px;
+    cursor: pointer;
+    font-size:18px;
+    border:1px solid white;
+    border-radius:5px;
+}
