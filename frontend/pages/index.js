@@ -30,7 +30,7 @@ export default function Home() {
       }
     } catch (error) {
       alert("Proceed to connecting your wallet....");
-      console.log(error);
+      console.log( "proceed",error);
     }
   }
 
