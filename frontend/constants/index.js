@@ -739,7 +739,7 @@ const factoryAbi = [
 		"type": "function"
 	}
 ]
-const factoryAddress = "0x71a9d115E322467147391c4a71D85F8e1cA623EF";
+const factoryAddress = "0x726560076F728f411Cf56e973e6ad1a63Bd5c790";
 
 const campaignAbi = 
 [

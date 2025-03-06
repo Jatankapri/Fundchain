@@ -1,5 +1,5 @@
 import { WagmiConfig, createClient, configureChains } from 'wagmi';
-import { hardhat } from 'wagmi/chains'; // Hardhat local chain
+import { hardhat , localhost } from 'wagmi/chains'; 
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { Web3Modal } from '@web3modal/react';
 import { EthereumClient, modalConnectors, walletConnectProvider } from '@web3modal/ethereum';
@@ -11,12 +11,12 @@ import { CampaignProvider } from '../context/CampaignContext';
 import '../styles/globals.css';
 
 // Hardhat configuration
-const chains = [hardhat];
+const chains = [localhost];
 const projectId = '0467d98c96e222de66895005aee2a481';
 
 // Wagmi client setup
 const { chains: configuredChains, provider } = configureChains(chains, [
-  jsonRpcProvider({ rpc: () => ({ http: 'https://a4fd-2400-1a00-4b81-132-b8d6-872d-23be-8e96.ngrok-free.app' }) }),
+  jsonRpcProvider({ rpc: () => ({ http: 'https://368d-2400-1a00-4b81-fcb5-f0ef-3cfb-2cf0-3a04.ngrok-free.app' }) }),
  // walletConnectProvider({ projectId: '0467d98c96e222de66895005aee2a481' }), // Connect to local Hardhat node
 ]);
 
