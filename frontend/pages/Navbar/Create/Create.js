@@ -23,8 +23,8 @@ const Create = () => {
 
       const resFile = await axios.post(url, formData, {
         headers: {
-          pinata_api_key: "b00b0ec02667a0be57bb",
-          pinata_secret_api_key: "bfdfe24ebecc0ecc19474556d98c602aa6bd2fc8030cf744452f700583259a2d",
+          pinata_api_key: "ca5199974ef2c2592db0",
+          pinata_secret_api_key: "0643702204c4256e18ecb913ecaa7d55e0487128f9a12c7725c0af93b22b8ad9",
           "Content-Type": "multipart/form-data",
         },
       });
