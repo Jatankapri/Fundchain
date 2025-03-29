@@ -114,14 +114,16 @@ export const FactoryProvider = ({ children }) => {
     }
   };
 
-  const getAuthorizers = async () => {
+  const getAuthorizersCurrentRoles = async () => {
     try {
-      const authorizers = await providerContract.getCurrentAuthorizers();
+      const addresses = await providerContract.getAuthorizerCurrentRoles();
+      console.log("address", addresses);
+      return addresses;
+    } catch (e) {
+      alert("unable to get the authorizer data");
+    }
 
-      return authorizers;
-    } catch (e) {}
-  };
-
+  }
   const getProtocols = async () => {
     const datas = await signerContract.getUnauthorizedProtocols();
     console.log("datas", datas);
@@ -138,7 +140,7 @@ export const FactoryProvider = ({ children }) => {
       value={{
         grantRole,
         revokeRole,
-        getAuthorizers,
+        getAuthorizersCurrentRoles,
         validateProtocolOf,
         getDeployedCampaignsAddress,
         registerYourProtocol,

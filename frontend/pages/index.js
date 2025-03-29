@@ -18,9 +18,9 @@ export default function Home() {
   async function getRole() {
     try {
       if (isConnected && address) {
-        const role = await FactoryContract.roles(`${address}`);
+        const role = await FactoryContract.authoirzerRoles(`${address}`);
         console.log("role", role);
-        if (role == "authorizer") {
+        if (role == "granted") {
           router.push(`/Authorizer`);
         } else if (role == "admin") {
           router.push(`/Admin`);

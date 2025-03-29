@@ -14,6 +14,7 @@ contract TenderFactory is AccessControl {
 
     // Only contains registered tender addresses after deployment.
     address[] deployedAuthorizedTenders;
+    address[] private authorizers; 
 
     event CreatedTender(
         address indexed owner,
@@ -31,7 +32,7 @@ contract TenderFactory is AccessControl {
 
     constructor() {
          admin=msg.sender;
-        roles[msg.sender]="admin";
+       
                 _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
     }
@@ -50,9 +51,8 @@ contract TenderFactory is AccessControl {
 
     mapping(address => Protocol[]) public protocols;
     mapping(uint => Protocol) public protocolTrack;
-    mapping(address => string) public roles;
+    mapping(address => string) public authoirzerRoles;
 
-    address[] public authorizers;
 
     modifier onlyAdmin() {
         require(admin == msg.sender, "caller is not an admin");
@@ -141,40 +141,53 @@ contract TenderFactory is AccessControl {
         return protocols[msg.sender];
     }
 
-    /// @dev Admin can grant role to other accounts for the role of authorizer.
+      /// @dev Admin can grant role to other accounts for the role of authorizer.
     function grantAuthorityRole(address _account) public onlyAdmin {
-        require(!hasRole(AUTHORIZER_ROLE, _account), "this address is already an authorizer");
+        require(!hasRole(AUTHORIZER_ROLE, _account), "This address is already an authorizer");
         grantRole(AUTHORIZER_ROLE, _account);
-        roles[_account] = "authorizer";
-        authorizers.push(_account);
+        authoirzerRoles[_account] = "granted";
+
+        // Check if the account is already in the list
+        bool exists = false;
+        for (uint256 i = 0; i < authorizers.length; i++) {
+            if (authorizers[i] == _account) {
+                exists = true;
+                break;
+            }
+        }
+
+        // If the account is not in the list, add it
+        if (!exists) {
+            authorizers.push(_account);
+        }
     }
 
     function revokeAuthorityRole(address _account) public onlyAdmin {
         require(hasRole(AUTHORIZER_ROLE, _account), "this address wasn't an authorizer");
         revokeRole(AUTHORIZER_ROLE, _account);
-        roles[_account] = "";
+        authoirzerRoles[_account] = "revoked";
 
-        filterAuthorizerArray(_account);
+      
     }
+     
+      function getAuthorizerCurrentRoles() public view returns (address[] memory, string[] memory) {
+        uint256 length = authorizers.length;
+        address[] memory addresses = new address[](length);
+        string[] memory statuses = new string[](length);
 
-    function filterAuthorizerArray(address acc) internal {
-        for (uint i = 0; i < authorizers.length; i++) {
-            if (authorizers[i] == acc) {
-                if (i < (authorizers.length - 1)) {
-                    authorizers[i] = authorizers[authorizers.length - 1];
-                }
-                authorizers.pop();
-                break;
-            }
+        for (uint256 i = 0; i < length; i++) {
+            addresses[i] = authorizers[i];
+            statuses[i] = authoirzerRoles[authorizers[i]];
         }
+
+        return (addresses, statuses);
     }
 
-    function getCurrentAuthorizers() public view returns (address[] memory) {
-        return authorizers;
-    }
+
+
 
     function getYourRole() public view returns (string memory) {
-        return roles[msg.sender];
+        return authoirzerRoles[msg.sender];
     }
 
     function getDeployedTenders() public view returns (address[] memory) {
