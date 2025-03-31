@@ -17,7 +17,7 @@ const RegistrationLogs = ({ getDatas }) => {
     setTimeout(() => {
       setLoading(false);
       setRender(true);
-    }, 8000);
+    }, 2500);
   };
 
   useEffect(() => {

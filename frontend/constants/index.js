@@ -725,15 +725,10 @@ const factoryAbi =[
 		"type": "function"
 	}
 ]
-const factoryAddress = "0xc603F90dE09e4043A863D7D2aDFb2DaB6039dE0B";
+const factoryAddress = "0xE28Bbac133bFE44B3E1Bf003968fc69b21Bf8d4e";
 
 const campaignAbi = 
 [
-	{
-		"inputs": [],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
 	{
 		"anonymous": false,
 		"inputs": [

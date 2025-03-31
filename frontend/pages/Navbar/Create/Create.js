@@ -160,10 +160,10 @@ const Create = () => {
           PDF UPLOAD*
           <br/>
           <input type="file" accept=".pdf" name="file" id="pdf" />
-          <br />
+          <br /><br/>
           {uploaded ? (
             <ExternalLink href={pdf}>
-              <p>Preview</p>
+              <p>Preview</p> <br/>
             </ExternalLink>
           ) : (
             <Button auto onPress={uploadToIpfs} rounded>

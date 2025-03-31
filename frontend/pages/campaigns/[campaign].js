@@ -173,9 +173,7 @@ const campaign = () => {
                 View Protocol
               </a>
               <br />
-              <b>
-                Refundable Status:<big> {details[9].toString()}</big>
-              </b>
+              
             </font>
             <br />
             <br />
@@ -194,10 +192,25 @@ const campaign = () => {
                 shadow
                 color="primary"
                 onPress={async () => {
-                  await donateToCampaign(campaign, amount);
-                  setTimeout(() => {
-                    setLoading(false);
-                  }, 25000);
+                  const minContribution = details[4] ? parseFloat(utils.formatEther(details[4])) : 0;
+                  const deadline = details[3] ? parseInt(details[3]) * 1000 : 0;
+                  const currentTime = Date.now();
+                  const enteredAmount = parseFloat(amount);
+                  
+                  if (currentTime > deadline) {
+                    alert("Donation is closed as the campaign deadline has passed.");
+                    return;
+                  }
+                  if (!enteredAmount || enteredAmount <= 0 || enteredAmount < minContribution) {
+                    alert("Please enter a valid amount greater than or equal to the minimum contribution.");
+                    return;
+                  }
+                  try {
+                    await donateToCampaign(campaign, amount);
+                    setTimeout(() => setLoading((prev) => !prev), 2500);
+                  } catch (error) {
+                    console.error("Donation failed:", error);
+                  }
                 }}
                 auto
               >

@@ -22,32 +22,75 @@ export const FactoryProvider = ({ children }) => {
   const providerContract = getFactoryContract(provider);
 
   const grantRole = async(account) => {
-    signerContract.grantAuthorityRole(account).then(async (tx) => {
-      tx.wait(1).then(() => {
+    try {
+      const tx = await signerContract.grantAuthorityRole(account);
+      await tx.wait(1);
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Successfully granted the role!",
+        showConfirmButton: false,
+        timer: 2500,
+      });
+    } catch (err) {
+      // Check if error has message property and contains the specific revert reason
+      if (err?.data?.message?.includes("This address is already an authorizer")) {
         Swal.fire({
           position: "top-end",
-          icon: "success",
-          title: "Successfully granted the role !",
+          icon: "error",
+          title: "This address is already an authorizer",
           showConfirmButton: false,
           timer: 2500,
         });
-      });
-    });
+      } else {
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: "An error occurred while granting the role",
+          showConfirmButton: false,
+          timer: 2500,
+        });
+      }
+      console.error("Error:", err);
+    }
   };
+  
+  
 
-  const revokeRole = (account) => {
-    signerContract.revokeAuthorityRole(account).then(async (tx) => {
-      tx.wait(1).then(() => {
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Successfully revoked the role !",
-          showConfirmButton: false,
-          timer: 2500,
-        });
+  const revokeRole = async (account) => {
+    try {
+      const tx = await signerContract.revokeAuthorityRole(account);
+      await tx.wait(1); // Wait for the transaction to be mined
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Successfully revoked the role!",
+        showConfirmButton: false,
+        timer: 2500,
       });
-    });
+    } catch (err) {
+      // Check if the error message contains specific known messages
+      let errorMessage = "An error occurred while revoking the role";
+  
+      // Customize message based on error details
+      if (err?.data?.message?.includes("this address wasn't an authorizer")) {
+        errorMessage = "This address isn't an authorizer";
+      } 
+  
+      // Show the custom error message using Swal
+      Swal.fire({
+        position: "top-end",
+        icon: "error",
+        title: errorMessage,
+        showConfirmButton: false,
+        timer: 2500,
+      });
+  
+      console.error("Error:", err);
+    }
   };
+  
+  
 
   const registerYourProtocol = async ({
     deadline,
@@ -117,10 +160,16 @@ export const FactoryProvider = ({ children }) => {
   const getAuthorizersCurrentRoles = async () => {
     try {
       const addresses = await providerContract.getAuthorizerCurrentRoles();
-      console.log("address", addresses);
-      return addresses;
+      const formattedData = addresses[0].map((address, index) => ({
+        address,
+        role: addresses[1][index] || "Unknown",
+      }));
+  
+      console.log("Formatted Data:", formattedData);
+      return formattedData;
     } catch (e) {
       alert("unable to get the authorizer data");
+      return [];
     }
 
   }

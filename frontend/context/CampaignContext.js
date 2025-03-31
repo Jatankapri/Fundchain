@@ -43,7 +43,7 @@ export const CampaignProvider = ({ children }) => {
   //-----function to donate the campaign
 
   const donateToCampaign = async (contract, amount) => {
-    console.log("contract", contract, "amout", amount);
+   // console.log("contract", contract, "amout", amount);
     try {
       const contract1 = await generateContract(contract, signer);
       const fund = utils.parseEther(`${amount}`);
@@ -62,6 +62,9 @@ export const CampaignProvider = ({ children }) => {
       console.error(e);
     }
   };
+
+
+  
   const getYourDonation = async (campaignAddress) => {
     try {
       const contracts = await generateContract(campaignAddress, provider);
@@ -93,7 +96,7 @@ export const CampaignProvider = ({ children }) => {
       await contract1.createRequest(description, recipient, payment);
     } catch (e) {
       alert("unable to create you request");
-      console.error(e);
+      console.log("Create request",e)
     }
   };
 
