@@ -21,16 +21,16 @@ export default function Home() {
         const role = await FactoryContract.authoirzerRoles(`${address}`);
         console.log("role", role);
         if (role == "granted") {
-          router.push(`/Authorizer`);
+          router.push('/Authorizer');
         } else if (role == "admin") {
-          router.push(`/Admin`);
+          router.push('/Admin');
         } else {
-          router.push(`/User`);
+          router.push('/User');
         }
       }
     } catch (error) {
       alert("Proceed to connecting your wallet....");
-      console.log( "proceed",error);
+      console.log("proceed", error);
     }
   }
 
