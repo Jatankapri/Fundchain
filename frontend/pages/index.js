@@ -11,37 +11,47 @@ import { useEffect } from "react";
 export default function Home() {
   const { address, isConnected } = useAccount();
   const provider = useProvider();
-
   const router = useRouter();
-  const FactoryContract = getFactoryContract(provider);
 
   async function getRole() {
     try {
-      if (isConnected && address) {
-        const role = await FactoryContract.authoirzerRoles(`${address}`);
-        console.log("role", role);
-        if (role == "granted") {
-          router.push('/Authorizer');
-        } else if (role == "admin") {
-          router.push('/Admin');
+      if (isConnected && address && provider) {
+        const FactoryContract = getFactoryContract(provider);
+
+        // Check if connected address is the admin
+        const adminAddress = await FactoryContract.admin();
+        console.log("admin:", adminAddress);
+        console.log("connected:", address);
+
+        if (adminAddress.toLowerCase() === address.toLowerCase()) {
+          router.push(`/Admin`);
+          return;
+        }
+
+        // Check authorizer role from mapping
+        const role = await FactoryContract.authoirzerRoles(address);
+        console.log("role:", role);
+
+        if (role === "granted") {
+          router.push(`/Authorizer`);
         } else {
-          router.push('/User');
+          router.push(`/User`);
         }
       }
     } catch (error) {
-      alert("Proceed to connecting your wallet....");
-      console.log("proceed", error);
+      console.log("getRole error:", error);
+      router.push(`/User`);
     }
   }
 
   useEffect(() => {
     getRole();
-  }, [address, isConnected]);
+  }, [address, isConnected, provider]);
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>donorchain.com</title>
+        <title>Fundchain.com</title>
         <link rel="icon" href="/ico.svg" />
       </Head>
       <div className={styles.div1}>
@@ -51,7 +61,6 @@ export default function Home() {
         <div>
           <h1 className={styles.h1}>Welcome!</h1>
         </div>
-
         <div className={styles.button}>
           <Web3Button />
         </div>

@@ -2,7 +2,7 @@ import { WagmiConfig, createClient, configureChains } from 'wagmi';
 import { hardhat , localhost } from 'wagmi/chains'; 
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { Web3Modal } from '@web3modal/react';
-import { EthereumClient, modalConnectors, walletConnectProvider } from '@web3modal/ethereum';
+import { EthereumClient, modalConnectors } from '@web3modal/ethereum';
 import { NextUIProvider } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -11,12 +11,12 @@ import { CampaignProvider } from '../context/CampaignContext';
 import '../styles/globals.css';
 
 // Hardhat configuration
-const chains = [localhost];
+const chains = [localhost, hardhat];
 const projectId = '0467d98c96e222de66895005aee2a481';
 
 // Wagmi client setup
 const { chains: configuredChains, provider } = configureChains(chains, [
-  jsonRpcProvider({ rpc: () => ({ http:'https://170b-2400-1a00-4ba3-4acf-7052-b2ce-1dd4-3667.ngrok-free.app' }) }),
+  jsonRpcProvider({ rpc: () => ({ http:' https://9e0f-2400-1a00-4ba3-a5f4-e874-3bd4-acce-8ec4.ngrok-free.app' }) }),
  // walletConnectProvider({ projectId: '0467d98c96e222de66895005aee2a481' }), // Connect to local Hardhat node
 ]);
 
@@ -34,8 +34,10 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     const unsubscribe = ethereumClient.watchAccount(() => {
-      router.push('/');
-    });
+      if (router.pathname !== '/') {
+        router.push('/');
+      }
+  }, [router, ethereumClient]);
     return () => unsubscribe();
   }, [router]);
 
@@ -48,6 +50,7 @@ function MyApp({ Component, pageProps }) {
           </CampaignProvider>
         </FactoryProvider>
       </NextUIProvider>
+      {/* Web3Modal provides a modal interface for connecting Ethereum wallets */}
       <Web3Modal projectId={projectId} ethereumClient={ethereumClient} />
     </WagmiConfig>
   );
