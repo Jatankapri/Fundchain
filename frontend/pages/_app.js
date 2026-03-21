@@ -16,7 +16,7 @@ const projectId = '0467d98c96e222de66895005aee2a481';
 
 // Wagmi client setup
 const { chains: configuredChains, provider } = configureChains(chains, [
-  jsonRpcProvider({ rpc: () => ({ http:' https://9e0f-2400-1a00-4ba3-a5f4-e874-3bd4-acce-8ec4.ngrok-free.app' }) }),
+  jsonRpcProvider({ rpc: () => ({ http:'  https://34ac-2400-1a00-4ba4-3932-1d3d-dcbb-6f16-7056.ngrok-free.app' }) }),
  // walletConnectProvider({ projectId: '0467d98c96e222de66895005aee2a481' }), // Connect to local Hardhat node
 ]);
 

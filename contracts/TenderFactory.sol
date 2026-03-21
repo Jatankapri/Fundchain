@@ -12,10 +12,10 @@ contract TenderFactory is AccessControl {
     address public admin;
     uint public index;
 
-    // Only contains registered tender addresses after deployment.
     address[] deployedAuthorizedTenders;
-    address[] private authorizers; 
+    address[] private authorizers;
 
+    // ── Existing Events (unchanged) ───────────────────────────────────────
     event CreatedTender(
         address indexed owner,
         address deployedTender,
@@ -30,11 +30,27 @@ contract TenderFactory is AccessControl {
         uint registeredTime
     );
 
-    constructor() {
-         admin=msg.sender;
-       
-                _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    // ── NEW: Metrics Events ───────────────────────────────────────────────
+    event RoleGranted(
+        address indexed account,
+        address indexed grantedBy,
+        uint256 timestamp
+    );
+    event RoleRevoked(
+        address indexed account,
+        address indexed revokedBy,
+        uint256 timestamp
+    );
+    event ProtocolValidated(
+        uint indexed protocolNum,
+        address indexed client,
+        address indexed authorizer,
+        uint256 timestamp
+    );
 
+    constructor() {
+        admin = msg.sender;
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
     struct Protocol {
@@ -52,7 +68,6 @@ contract TenderFactory is AccessControl {
     mapping(address => Protocol[]) public protocols;
     mapping(uint => Protocol) public protocolTrack;
     mapping(address => string) public authoirzerRoles;
-
 
     modifier onlyAdmin() {
         require(admin == msg.sender, "caller is not an admin");
@@ -110,7 +125,13 @@ contract TenderFactory is AccessControl {
         );
         deployedAuthorizedTenders.push(address(tenderPointer));
 
-        emit CreatedTender(creator, address(tenderPointer), protocolTrack[num].category, protocolTrack[num].image, block.timestamp);
+        emit CreatedTender(
+            creator,
+            address(tenderPointer),
+            protocolTrack[num].category,
+            protocolTrack[num].image,
+            block.timestamp
+        );
     }
 
     /// @dev Authorizer uses this function to validate the protocols.
@@ -134,20 +155,29 @@ contract TenderFactory is AccessControl {
 
         require(protocolFound, "Protocol not associated with this address");
 
-        createTender(_client, ProtocolItem.deadline, ProtocolItem.target, ProtocolItem.minimumContribution, ProtocolItem.url, protocolNum);
+        // ── NEW: emit validation event ────────────────────────────────────
+        emit ProtocolValidated(protocolNum, _client, msg.sender, block.timestamp);
+
+        createTender(
+            _client,
+            ProtocolItem.deadline,
+            ProtocolItem.target,
+            ProtocolItem.minimumContribution,
+            ProtocolItem.url,
+            protocolNum
+        );
     }
 
     function getProtocol() public view returns (Protocol[] memory) {
         return protocols[msg.sender];
     }
 
-      /// @dev Admin can grant role to other accounts for the role of authorizer.
+    /// @dev Admin can grant role to other accounts for the role of authorizer.
     function grantAuthorityRole(address _account) public onlyAdmin {
         require(!hasRole(AUTHORIZER_ROLE, _account), "This address is already an authorizer");
         grantRole(AUTHORIZER_ROLE, _account);
         authoirzerRoles[_account] = "granted";
 
-        // Check if the account is already in the list
         bool exists = false;
         for (uint256 i = 0; i < authorizers.length; i++) {
             if (authorizers[i] == _account) {
@@ -155,11 +185,12 @@ contract TenderFactory is AccessControl {
                 break;
             }
         }
-
-        // If the account is not in the list, add it
         if (!exists) {
             authorizers.push(_account);
         }
+
+        // ── NEW: emit role event ──────────────────────────────────────────
+        emit RoleGranted(_account, msg.sender, block.timestamp);
     }
 
     function revokeAuthorityRole(address _account) public onlyAdmin {
@@ -167,10 +198,11 @@ contract TenderFactory is AccessControl {
         revokeRole(AUTHORIZER_ROLE, _account);
         authoirzerRoles[_account] = "revoked";
 
-      
+        // ── NEW: emit role event ──────────────────────────────────────────
+        emit RoleRevoked(_account, msg.sender, block.timestamp);
     }
-     
-      function getAuthorizerCurrentRoles() public view returns (address[] memory, string[] memory) {
+
+    function getAuthorizerCurrentRoles() public view returns (address[] memory, string[] memory) {
         uint256 length = authorizers.length;
         address[] memory addresses = new address[](length);
         string[] memory statuses = new string[](length);
@@ -182,9 +214,6 @@ contract TenderFactory is AccessControl {
 
         return (addresses, statuses);
     }
-
-
-
 
     function getYourRole() public view returns (string memory) {
         return authoirzerRoles[msg.sender];
@@ -209,6 +238,7 @@ contract TenderFactory is AccessControl {
     }
 }
 
+// ── Tender Contract ────────────────────────────────────────────────────────
 contract Tender {
     address public owner;
     address public authorizer;
@@ -222,7 +252,14 @@ contract Tender {
     uint256 public numOfRegisteredTender;
     bool public destroyed;
 
+    // ── Existing Event (unchanged) ─────────────────────────────────────
     event DonorEvent(address indexed donor, uint amount, uint time);
+
+    // ── NEW: Metrics Events ────────────────────────────────────────────
+    event RefundIssued(address indexed donor, uint256 amount, uint256 timestamp);
+    event RequestCreated(uint256 indexed requestNo, string description, address recipient, uint256 value, uint256 timestamp);
+    event RequestVoted(uint256 indexed requestNo, address indexed voter, uint256 timestamp);
+    event RequestSettled(uint256 indexed requestNo, address indexed recipient, uint256 value, uint256 timestamp);
 
     constructor() {
         destroyed = false;
@@ -282,7 +319,6 @@ contract Tender {
         require(owner != msg.sender, "Owner can't donate to self");
         require(msg.value <= target, "Donation exceeds target");
         require(numRequests == 0, "Raised target has already met");
-
         require(msg.value >= minimumContribution, "Minimum donation not met");
 
         if (donors[msg.sender] == 0) {
@@ -290,14 +326,24 @@ contract Tender {
         }
         donors[msg.sender] += msg.value;
         raisedTarget += msg.value;
+
+        // Existing event (unchanged)
         emit DonorEvent(msg.sender, msg.value, block.timestamp);
     }
 
     /// @dev Refund for donors if criteria are met.
     function refund() public onlyDonor shouldNotDestroy {
-        require(block.timestamp < deadline && raisedTarget < target, "You are not eligible for refund");
-        payable(msg.sender).transfer(donors[msg.sender]);
+        require(
+            block.timestamp < deadline && raisedTarget < target,
+            "You are not eligible for refund"
+        );
+        uint256 amount = donors[msg.sender];
+        payable(msg.sender).transfer(amount);
         donors[msg.sender] = 0;
+
+        // ── NEW: emit refund event ─────────────────────────────────────
+        emit RefundIssued(msg.sender, amount, block.timestamp);
+
         if (address(this).balance == 0) {
             destroyed = true;
         }
@@ -340,14 +386,20 @@ contract Tender {
         address payable _recipient,
         uint256 _value
     ) public payable onlyOwner shouldNotDestroy {
-        // @todo
-        require(block.timestamp >= deadline && raisedTarget <= target, "Doesn't meet request criteria");
+        require(
+            block.timestamp >= deadline && raisedTarget <= target,
+            "Doesn't meet request criteria"
+        );
         Request storage newRequest = requests[numRequests];
         newRequest.description = _description;
         newRequest.recipient = _recipient;
         newRequest.value = _value;
         newRequest.completed = false;
         newRequest.noOfVoters = 0;
+
+        // ── NEW: emit request event ────────────────────────────────────
+        emit RequestCreated(numRequests, _description, _recipient, _value, block.timestamp);
+
         numRequests++;
     }
 
@@ -359,6 +411,9 @@ contract Tender {
 
         thisRequest.voters[msg.sender] = true;
         thisRequest.noOfVoters++;
+
+        // ── NEW: emit vote event ───────────────────────────────────────
+        emit RequestVoted(_requestNo, msg.sender, block.timestamp);
     }
 
     /// @dev Settle a request after sufficient votes.
@@ -370,7 +425,11 @@ contract Tender {
 
         thisRequest.recipient.transfer(thisRequest.value);
         thisRequest.completed = true;
+
+        // ── NEW: emit settle event ─────────────────────────────────────
+        emit RequestSettled(_requestNo, thisRequest.recipient, thisRequest.value, block.timestamp);
     }
+
     function getRequeststatus(uint256 _i)
         public
         view
@@ -390,7 +449,7 @@ contract Tender {
             requests[_i].completed,
             requests[_i].value,
             requests[_i].recipient,
-            requests[_i].noOfVoters,
+            requests[_i].value,
             requests[_i].description,
             owner,
             noOfDonors

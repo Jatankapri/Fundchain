@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Web3Button } from "@web3modal/react";
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import styles from "../styles/Admin.module.css";
 import { useFactory } from "../context/CampaignFactory";
 import { Button, Input, Spacer, Text, Table, Grid } from "@nextui-org/react";
@@ -10,9 +11,9 @@ const Admin = () => {
   const inputRef = useRef();
   const [authorizers, setAuthorizers] = useState([]);
   const [reRender, setRender] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Track loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // Fetch data from blockchain contract
   const fetchData = async () => {
     try {
       const authorizersData = await getAuthorizersCurrentRoles();
@@ -26,11 +27,9 @@ const Admin = () => {
     fetchData();
   }, [reRender]);
 
-  // Separate granted and revoked roles
   const grantedList = authorizers.filter(auth => auth.role === "granted").map(auth => auth.address);
   const revokedList = authorizers.filter(auth => auth.role === "revoked").map(auth => auth.address);
 
-  // Ensure both lists have the same number of rows
   const maxLength = Math.max(grantedList.length, revokedList.length);
   const paddedGranted = [...grantedList, ...Array(maxLength - grantedList.length).fill("")];
   const paddedRevoked = [...revokedList, ...Array(maxLength - revokedList.length).fill("")];
@@ -41,47 +40,31 @@ const Admin = () => {
       return false;
     }
     return true;
-  }
+  };
 
-  // Grant role function
   async function grantRoleFor() {
-    if (!checkInput()) {
-      return;
-    }
-
-    setIsLoading(true); 
+    if (!checkInput()) return;
+    setIsLoading(true);
     try {
       await grantRole(inputRef.current.value);
-      setTimeout(() => {
-        setRender(prev => !prev); 
-        setIsLoading(false); 
-      }, 2000);
+      setTimeout(() => { setRender(prev => !prev); setIsLoading(false); }, 2000);
     } catch {
-      console.log("adasdsa");
       alert("Unable to grant the role");
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   }
 
-  // Revoke role function
   async function revokeRoleFor() {
-    if (!checkInput()) {
-      return;
-    }
-
-    setIsLoading(true); 
+    if (!checkInput()) return;
+    setIsLoading(true);
     try {
       await revokeRole(inputRef.current.value);
-      setTimeout(() => {
-        setRender(prev => !prev); 
-        setIsLoading(false); 
-      }, 2000);
+      setTimeout(() => { setRender(prev => !prev); setIsLoading(false); }, 2000);
     } catch {
       alert("Unable to revoke the role");
-      setIsLoading(false); 
+      setIsLoading(false);
+    }
   }
-
-}
 
   return (
     <>
@@ -90,7 +73,25 @@ const Admin = () => {
           <Image src={"/navBarLogo.png"} height={150} width={400} quality={100} alt="logo" priority />
         </div>
         <font className={styles.heading}>ADMIN PAGE</font>
-        <div className={styles.option}>
+        <div className={styles.option} style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          {/* ── Metrics Button ── */}
+          <button
+            onClick={() => router.push("/Metrics")}
+            style={{
+              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              padding: "10px 20px",
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+              letterSpacing: "0.04em",
+              whiteSpace: "nowrap",
+            }}
+          >
+            📊 View Metrics
+          </button>
           <Web3Button />
         </div>
       </div>
@@ -102,13 +103,13 @@ const Admin = () => {
             <Text b css={{ fontSize: "18px" }}>ROLE ACCESS CONTROL</Text>
             <Spacer y="0.5" />
             <form>
-              <Input 
-                rounded 
-                bordered 
-                label="Account Address" 
-                placeholder="0x00...." 
-                color="secondary" 
-                ref={inputRef} 
+              <Input
+                rounded
+                bordered
+                label="Account Address"
+                placeholder="0x00...."
+                color="secondary"
+                ref={inputRef}
                 css={{ fontSize: "14px" }}
               />
               <Spacer y={1} />
@@ -121,19 +122,17 @@ const Admin = () => {
 
           {/* Table Section */}
           <Grid xs={12} sm={7}>
-          
             <Table
               bordered
               shadow
               color="secondary"
               aria-label="Authorizers table"
               css={{
-                
                 borderCollapse: "separate",
-                borderSpacing: "20px 15px", 
-                minWidth: "100%", 
+                borderSpacing: "20px 15px",
+                minWidth: "100%",
                 fontSize: "14px",
-                width: "100%", 
+                width: "100%",
               }}
             >
               <Table.Header>

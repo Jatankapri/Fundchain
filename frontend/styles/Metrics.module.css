@@ -1,0 +1,254 @@
+/* styles/Metrics.module.css */
+
+.page {
+  min-height: 100vh;
+  background: #0a0e1a;
+  color: #e2e8f0;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 2rem;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #1e2a45;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 0.4rem;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── Section ── */
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.sectionHeading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+/* ── Cards ── */
+.card {
+  background: #111827;
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid #1e2a45;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+.cardLabel {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.5rem;
+}
+
+.cardValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.cardUnit {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #94a3b8;
+  margin-left: 2px;
+}
+
+.cardSub {
+  font-size: 0.72rem;
+  color: #475569;
+  margin: 0.4rem 0 0;
+}
+
+/* ── Color Variants ── */
+.blue  .cardValue { color: #60a5fa; }
+.green .cardValue { color: #34d399; }
+.red   .cardValue { color: #f87171; }
+.purple .cardValue { color: #a78bfa; }
+.yellow .cardValue { color: #fbbf24; }
+
+.blue  { border-color: #1e3a5f; }
+.green { border-color: #064e3b; }
+.red   { border-color: #4c1010; }
+.purple { border-color: #3b1f6e; }
+.yellow { border-color: #4a3200; }
+
+/* ── Chart ── */
+.chartWrap {
+  background: #111827;
+  border: 1px solid #1e2a45;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 0.85rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 1.2rem;
+}
+
+.barChart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.75rem;
+  height: 160px;
+  padding-top: 2rem;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.barVolLabel {
+  font-size: 0.62rem;
+  color: #475569;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.barTrack {
+  flex: 1;
+  width: 100%;
+  background: #1e2a45;
+  border-radius: 4px 4px 0 0;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  background: linear-gradient(180deg, #60a5fa, #3b82f6);
+  border-radius: 4px 4px 0 0;
+  min-height: 4px;
+  transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.barLabel {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 6px;
+}
+
+.barCount {
+  font-size: 0.62rem;
+  color: #475569;
+}
+
+/* ── Table ── */
+.tableWrap {
+  margin-top: 1.5rem;
+  background: #111827;
+  border: 1px solid #1e2a45;
+  border-radius: 12px;
+  padding: 1.5rem;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.table th {
+  text-align: left;
+  color: #475569;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #1e2a45;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 0.75rem 1rem;
+  color: #cbd5e1;
+  border-bottom: 1px solid #0f172a;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover td {
+  background: #1e2a45;
+}
+
+.address {
+  font-family: 'Courier New', monospace;
+  color: #60a5fa !important;
+}
+
+/* ── Loading / Error ── */
+.centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: #64748b;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #1e2a45;
+  border-top-color: #60a5fa;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  color: #f87171;
+  font-size: 1rem;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .page { padding: 1rem; }
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .title { font-size: 1.5rem; }
+}

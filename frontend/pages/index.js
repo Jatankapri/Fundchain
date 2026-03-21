@@ -55,7 +55,7 @@ export default function Home() {
         <link rel="icon" href="/ico.svg" />
       </Head>
       <div className={styles.div1}>
-        <Image src={logo} alt="logo" width={550} height={800} />
+        <Image src={logo} alt="logo" width={550} height={800} priority />
       </div>
       <div className={styles.div2}>
         <div>
