@@ -3,52 +3,91 @@ import { Web3Button } from "@web3modal/react";
 import Image from "next/image";
 import Link from "next/link";
 import { Dropdown } from "@nextui-org/react";
+import { useState } from "react";
 
 const Navbar = () => {
-  return (
-    <div className={styles.main}>
-      <Image
-        src={"/navbarLogo.png"}
-        height={130}
-        width={320}
-        quality={100}
-        alt={"logo"}
-        priority
-      ></Image>
+  const [portalOpen, setPortalOpen] = useState(false);
 
-      <div className={styles.option}>
-        <Link href={"/User"} style={{ textDecoration: "none", color: "white" }}>
+  return (
+    <nav className={styles.main}>
+      {/* Logo */}
+      <div className={styles.logo}>
+        <Image
+          src={"/navbarLogo.png"}
+          height={110}
+          width={280}
+          quality={100}
+          alt={"logo"}
+          priority
+        />
+      </div>
+
+      {/* Nav links */}
+      <div className={styles.links}>
+        <Link href={"/User"} className={styles.link}>
           User Guidelines
         </Link>
-      </div>
 
-      <div className={styles.trigger}>
-        <Dropdown>
-          <Dropdown.Button flat>Portal</Dropdown.Button>
-          <Dropdown.Menu aria-label="Static Actions">
-            <Dropdown.Item key="new">
-              <Link href="/Navbar/Create/Create">Registration Form</Link>
-            </Dropdown.Item>
-            <Dropdown.Item key="copy">
-              <Link href="/Navbar/History">Application Status</Link>
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
+        {/* Portal dropdown */}
+        <div className={styles.dropdownWrap}>
+          <Dropdown>
+            <Dropdown.Button
+              flat
+              css={{
+                background: "rgba(255,255,255,0.08)",
+                color: "#e2e8f0",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: "8px",
+                fontWeight: 400,
+                fontSize: "15px",
+                height: "36px",
+                padding: "0 16px",
+                "&:hover": {
+                  background: "rgba(255,255,255,0.14)",
+                },
+              }}
+            >
+              Portal
+            </Dropdown.Button>
+            <Dropdown.Menu
+              aria-label="Portal menu"
+              css={{
+                background: "#1e293b",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: "10px",
+                padding: "6px",
+              }}
+            >
+              <Dropdown.Item
+                key="new"
+                css={{ borderRadius: "7px", color: "#e2e8f0" }}
+              >
+                <Link href="/Navbar/Create/Create" className={styles.dropLink}>
+                  📝 Registration Form
+                </Link>
+              </Dropdown.Item>
+              <Dropdown.Item
+                key="copy"
+                css={{ borderRadius: "7px", color: "#e2e8f0" }}
+              >
+                <Link href="/Navbar/History" className={styles.dropLink}>
+                  📋 Application Status
+                </Link>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>
 
-      <div className={styles.option}>
-        <Link
-          href={"/campaigns"}
-          style={{ textDecoration: "none", color: "white" }}
-        >
+        <Link href={"/campaigns"} className={styles.link}>
           Campaigns
         </Link>
       </div>
 
-      <div className={styles.button}>
+      {/* Wallet button */}
+      <div className={styles.wallet}>
         <Web3Button />
       </div>
-    </div>
+    </nav>
   );
 };
 

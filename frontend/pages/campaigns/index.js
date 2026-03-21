@@ -1,159 +1,146 @@
 import Navbar from "../Navbar/Navbar";
-import { Card, Grid, Row, Text, Loading, Spacer } from "@nextui-org/react";
-import { factoryAddress, factoryAbi } from "../../constants";
+import styles from "./campaigns.module.css";
 import { useState, useEffect } from "react";
 import { ethers, Contract } from "ethers";
+import { factoryAddress, factoryAbi } from "../../constants";
 import { useRouter } from "next/router";
+
+const CATEGORIES = [
+  "All",
+  "Miscellaneous",
+  "Education",
+  "Health",
+  "Sports",
+  "Community support",
+  "Woman",
+];
 
 const index = () => {
   const provider =
-    typeof window == "undefined"
+    typeof window === "undefined"
       ? ethers.getDefaultProvider()
       : new ethers.providers.Web3Provider(window.ethereum);
-  const contract = new Contract(factoryAddress, factoryAbi, provider);
 
-  const router = useRouter();
+  const contract = new Contract(factoryAddress, factoryAbi, provider);
+  const router   = useRouter();
+
   const [campaigns, setCampaigns] = useState([]);
-  const [isSearch, setSearch] = useState(false);
+  const [selected, setSelected]   = useState("All");
+  const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
     async function call() {
-      const latestBlock = await provider.getBlockNumber();
-      const logs = await contract.queryFilter(
-        "CreatedTender",
-        
-      );
+      setLoading(true);
+      const logs = await contract.queryFilter("CreatedTender");
       setCampaigns(logs);
-      console.log("logs", logs);
+      setLoading(false);
     }
     call();
   }, []);
 
+  const filtered = campaigns.filter((c) =>
+    selected === "All" ? true : c.args.category === selected
+  );
+
+  const formatDate = (timestamp) =>
+    new Date(parseInt(timestamp * 1000)).toLocaleDateString("en-US", {
+      year: "numeric", month: "short", day: "numeric",
+    });
+
   return (
-    <div>
+    <div className={styles.page}>
       <Navbar />
-      <h1
-        style={{
-          marginLeft: "45%",
-        }}
-      >
-        Campaign page
-      </h1>
 
-      <br />
-      <br />
-      <div>
-        <form
-          style={{
-            margin: "1%",
-            fontWeight: "bold",
-          }}
-        >
-          <h2>SEARCH BY CATEGORY</h2>
-          <br />
-
-          <select
-            id="category"
-            defaultValue="all"
-            onChange={(e) => {
-              const selectedValue = e.target.value;
-              if (selectedValue === "all") {
-                setSearch(false);
-              } else {
-                setSearch(selectedValue);
-              }
-            }}
-          >
-            <option value="miscellaneous">Miscellaneous</option>
-            <option value="Education">Education</option>
-            <option value="Health">Health</option>
-            <option value="Sports">Sports</option>
-            <option value="Community support">Community support</option>
-            <option value="Woman">Woman</option>
-            <option value="all">Show All</option>
-          </select>
-
-          <br />
-
-          <br />
-        </form>
+      {/* ── Hero ── */}
+      <div className={styles.hero}>
+        <span className={styles.heroTag}>Verified Campaigns</span>
+        <h1 className={styles.heroTitle}>
+          Browse <span className={styles.heroAccent}>Campaigns</span>
+        </h1>
+        <p className={styles.heroSub}>
+          All campaigns listed here have been verified by authorizers.
+          Your donation goes directly to the beneficiary — no middlemen.
+        </p>
       </div>
 
-      <Grid.Container gap={4} justify="flex-start">
-        {campaigns
-          .filter((campaign) =>
-            isSearch ? campaign.args.category === isSearch : true
-          )
-          .map((item, index) => (
-            <Grid
-              xs={10}
-              sm={3}
-              key={index}
-              css={{
-                marginBottom: "5%",
-              }}
+      {/* ── Filter ── */}
+      <div className={styles.filterWrap}>
+        <div className={styles.filterRow}>
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              className={`${styles.filterBtn} ${selected === cat ? styles.filterActive : ""}`}
+              onClick={() => setSelected(cat)}
             >
-              <Card
-                isPressable
-                isHoverable
+              {cat}
+            </button>
+          ))}
+        </div>
+        <span className={styles.resultCount}>
+          {filtered.length} campaign{filtered.length !== 1 ? "s" : ""}
+        </span>
+      </div>
+
+      {/* ── Grid ── */}
+      <div className={styles.container}>
+        {loading ? (
+          <div className={styles.loadingWrap}>
+            <div className={styles.spinner} />
+            <p>Loading campaigns...</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className={styles.empty}>
+            <span className={styles.emptyIcon}>🔍</span>
+            <p>No campaigns found in this category.</p>
+          </div>
+        ) : (
+          <div className={styles.grid}>
+            {filtered.map((item, index) => (
+              <div
                 key={index}
-                onPress={() => {
+                className={styles.card}
+                onClick={() =>
                   router.push({
                     pathname: "/campaigns/[campaign]",
                     query: { campaign: item.args.deployedTender },
-                  });
-                }}
+                  })
+                }
               >
-                <Card.Body css={{ p: 0 }}>
-                  <Card.Image
+                {/* Image */}
+                <div className={styles.cardImg}>
+                  <img
                     src={item.args.image}
-                    objectFit="cover"
-                    width="100%"
-                    height={300}
                     alt="campaign"
+                    onError={(e) => { e.target.src = "/placeholder.png"; }}
                   />
-                </Card.Body>
+                  <div className={styles.categoryBadge}>
+                    {item.args.category}
+                  </div>
+                </div>
 
-                <Card.Footer css={{ justifyContent: "flex-start" }}>
-                  <div>
-                    <Row wrap="wrap" justify="space-between" align="center">
-                      <Text b>CATEGORY</Text>
-                      <Text
-                        css={{
-                          color: "$accents7",
-                          fontWeight: "$semibold",
-                          fontSize: "$sm",
-                        }}
-                      >
-                        {item.args.category}
-                        &nbsp;
-                      </Text>
-                    </Row>
+                {/* Body */}
+                <div className={styles.cardBody}>
+                  <div className={styles.cardMeta}>
+                    <span className={styles.verifiedBadge}>✓ Verified</span>
+                    <span className={styles.cardDate}>
+                      {formatDate(item.args.createTime)}
+                    </span>
                   </div>
-                  <Spacer x={6} />
-                  <div>
-                    <Row wrap="wrap" justify="space-between" align="center">
-                      <Text b>Created Time:</Text>
-                      <Text
-                        css={{
-                          color: "$accents7",
-                          fontWeight: "$semibold",
-                          fontSize: "$sm",
-                        }}
-                      >
-                        &nbsp;
-                        {new Date(
-                          parseInt(item.args.createTime * 1000)
-                        ).toString()}
-                      </Text>
-                    </Row>
+                  <div className={styles.cardAddress}>
+                    {item.args.deployedTender.slice(0, 10)}...
+                    {item.args.deployedTender.slice(-6)}
                   </div>
-                </Card.Footer>
-              </Card>
-            </Grid>
-          ))}
-      </Grid.Container>
+                  <div className={styles.cardFooter}>
+                    <span className={styles.viewBtn}>View Campaign →</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
 export default index;

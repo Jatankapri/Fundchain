@@ -1,3 +1,340 @@
-.heading{
-    color: blue;
+/* requests/index.module.css */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap');
+
+.page {
+  font-family: 'DM Sans', sans-serif;
+  padding: 8px 0;
+}
+
+/* ── Form card ── */
+.formWrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px 36px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  margin-bottom: 28px;
+}
+
+.formHeader {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.formTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px;
+}
+
+.formSub {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* ── Fields ── */
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.required {
+  color: #e11d48;
+  margin-left: 4px;
+  font-size: 0.7rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.fieldHint {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+  font-weight: 300;
+}
+
+.input {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+  background: #fff;
+}
+
+.textarea {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.textarea:focus {
+  border-color: #3b82f6;
+  background: #fff;
+}
+
+/* ── Upload ── */
+.uploadRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fileInput {
+  font-size: 0.85rem;
+  color: #374151;
+  flex: 1;
+  min-width: 0;
+}
+
+.uploadBtn {
+  padding: 9px 18px;
+  background: #0f172a;
+  color: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.uploadBtn:hover { background: #1e293b; }
+.uploadBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.uploadedBtn {
+  background: #16a34a !important;
+}
+
+.proofLink {
+  font-size: 0.82rem;
+  color: #2563eb;
+  text-decoration: none;
+  margin-top: 4px;
+}
+
+.proofLink:hover { text-decoration: underline; }
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.submitBtn {
+  padding: 11px 28px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.submitBtn:hover { background: #1d4ed8; }
+.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.resetBtn {
+  padding: 11px 20px;
+  background: transparent;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.resetBtn:hover { border-color: #94a3b8; color: #374151; }
+
+/* ── Log ── */
+.logWrap {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+}
+
+.logHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.logTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.logCount {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.logLoading {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.logEmpty {
+  text-align: center;
+  padding: 40px;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+/* ── Table ── */
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafafa;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 14px 16px;
+  color: #374151;
+  border-bottom: 1px solid #f8fafc;
+  vertical-align: middle;
+}
+
+.table tr:last-child td { border-bottom: none; }
+.table tr:hover td { background: #fafafa; }
+
+.rowDone td { opacity: 0.55; }
+
+.descCell {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.addrCell {
+  font-family: monospace;
+  font-size: 0.82rem;
+  color: #2563eb;
+}
+
+.votes {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.proofBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #eff6ff;
+  color: #2563eb;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.proofBadge:hover { background: #dbeafe; }
+
+.noProof { color: #cbd5e1; }
+
+.statusBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.statusPending {
+  background: #fef9c3;
+  color: #a16207;
+}
+
+.statusDone {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .formWrap { padding: 22px 20px; }
+  .row { grid-template-columns: 1fr; }
+  .logHeader { padding: 16px 20px; }
+  .table th, .table td { padding: 10px 12px; }
 }

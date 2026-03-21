@@ -1,120 +1,143 @@
 import React, { useState, useEffect } from "react";
-import { Table, Collapse, Button, Loading } from "@nextui-org/react";
+import styles from "./index.module.css";
 import { useCampaign } from "../../../context/CampaignContext";
 import { useAccount } from "wagmi";
 import { utils } from "ethers";
+import { Button, Loading } from "@nextui-org/react";
 
 const Log = ({ campaignAddress, owner }) => {
   const { address } = useAccount();
+  const { getRequestStatus, voteRequestToCampaign, settleRequestOf } = useCampaign();
 
-  const { getRequestStatus, voteRequestToCampaign, settleRequestOf } =
-    useCampaign();
-
-  const [log, setLog] = useState([]);
+  const [log, setLog]         = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const [loadingLog, setLoadingLog] = useState(true);
+  const [actionIdx, setActionIdx]   = useState(null); // tracks which row is busy
 
   useEffect(() => {
     async function call() {
-      console.log(
-        "campaign data",
-        await getRequestStatus(`${campaignAddress}`)
-      );
-
-      setLog(await getRequestStatus(`${campaignAddress}`));
+      setLoadingLog(true);
+      const data = await getRequestStatus(`${campaignAddress}`);
+      setLog(data || []);
+      setLoadingLog(false);
     }
     call();
   }, [refresh]);
 
+  // Parse proof URL out of description if present
+  const parseDescription = (raw) => {
+    if (!raw) return { desc: "—", proof: null };
+    const parts = raw.split(" | Proof: ");
+    return {
+      desc:  parts[0] || raw,
+      proof: parts[1] || null,
+    };
+  };
+
   return (
-    <>
-      <div>
-        <Collapse
-          title="Payment Request State Log"
-          css={{
-            marginTop: "3%",
-            marginRight: "2%",
-            background: "$blue100",
-          }}
-          bordered
-          expanded
-        >
-          <Table
-            aria-label="Example table with dynamic content"
-            css={{
-              height: "auto",
-              width: "100%",
-              margin: "4%",
-              background: "$white100",
-            }}
-            shadow={true}
-            selectionMode="single"
-          >
-            <Table.Header>
-              <Table.Column>Request NO.</Table.Column>
-              <Table.Column>Description</Table.Column>
-              <Table.Column>Recipient</Table.Column>
-              <Table.Column>Amount</Table.Column>
-              <Table.Column>Donors/Voters</Table.Column>
-              <Table.Column>Complete Status</Table.Column>
-              <Table.Column> Action</Table.Column>
-              <Table.Column></Table.Column>
-            </Table.Header>
-            <Table.Body>
-              {log != undefined ? (
-                log.map((e, index) => (
-                  <Table.Row key={index}>
-                    <Table.Cell>{index}</Table.Cell>
-                    <Table.Cell>{e[5]}</Table.Cell>
-                    <Table.Cell>{e[3]}</Table.Cell>
-                    <Table.Cell>{utils.formatEther(e[2])}</Table.Cell>
-                    <Table.Cell>
-                      {e[7].toString()}/{e[4].toString()}
-                    </Table.Cell>
-                    <Table.Cell>
-                      {e[1] == false ? "Inprogress" : "Succeed"}
-                    </Table.Cell>
-                    <Table.Cell>
-                      <Button
-                        auto
-                        color="primary"
-                        onPress={async () => {
-                          await voteRequestToCampaign(campaignAddress, index);
-                          setTimeout(() => {
-                            setRefresh(true);
-                          }, 8000);
-                        }}
-                        rounded
-                      >
-                        Vote
-                      </Button>
-                    </Table.Cell>
-                    <Table.Cell>
-                      {address === owner && (
+    <div className={styles.logWrap}>
+      <div className={styles.logHeader}>
+        <h3 className={styles.logTitle}>Payment Request Log</h3>
+        <span className={styles.logCount}>{log.length} request{log.length !== 1 ? "s" : ""}</span>
+      </div>
+
+      {loadingLog ? (
+        <div className={styles.logLoading}>
+          <Loading type="spinner" size="lg" />
+        </div>
+      ) : log.length === 0 ? (
+        <div className={styles.logEmpty}>
+          No withdrawal requests have been created yet.
+        </div>
+      ) : (
+        <div className={styles.tableWrap}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Description</th>
+                <th>Recipient</th>
+                <th>Amount</th>
+                <th>Votes</th>
+                <th>Proof</th>
+                <th>Status</th>
+                <th>Vote</th>
+                <th>Settle</th>
+              </tr>
+            </thead>
+            <tbody>
+              {log.map((e, index) => {
+                const { desc, proof } = parseDescription(e[5]);
+                const completed       = e[1];
+                const isBusy          = actionIdx === index;
+
+                return (
+                  <tr key={index} className={completed ? styles.rowDone : ""}>
+                    <td>{index}</td>
+                    <td className={styles.descCell}>{desc}</td>
+                    <td className={styles.addrCell}>
+                      {e[3].slice(0, 6)}...{e[3].slice(-4)}
+                    </td>
+                    <td>{utils.formatEther(e[2])} ETH</td>
+                    <td>
+                      <span className={styles.votes}>
+                        {e[7].toString()} / {e[4].toString()}
+                      </span>
+                    </td>
+                    <td>
+                      {proof ? (
+                        <a href={proof} target="_blank" rel="noopener noreferrer" className={styles.proofBadge}>
+                          View
+                        </a>
+                      ) : (
+                        <span className={styles.noProof}>—</span>
+                      )}
+                    </td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${completed ? styles.statusDone : styles.statusPending}`}>
+                        {completed ? "Settled" : "Pending"}
+                      </span>
+                    </td>
+                    <td>
+                      {!completed && (
                         <Button
-                          auto
-                          color="success"
+                          auto flat color="primary" size="sm"
+                          css={{ borderRadius: "7px", minWidth: "60px" }}
+                          disabled={isBusy}
                           onPress={async () => {
-                            await settleRequestOf(campaignAddress, index);
-                            setTimeout(() => {
-                              setRefresh(true);
-                            }, 8000);
+                            setActionIdx(index);
+                            await voteRequestToCampaign(campaignAddress, index);
+                            setTimeout(() => { setRefresh((p) => !p); setActionIdx(null); }, 4000);
                           }}
-                          rounded
                         >
-                          Settle Request
+                          {isBusy ? "..." : "Vote"}
                         </Button>
                       )}
-                    </Table.Cell>
-                  </Table.Row>
-                ))
-              ) : (
-                <Loading />
-              )}
-            </Table.Body>
-          </Table>
-        </Collapse>
-      </div>
-    </>
+                    </td>
+                    <td>
+                      {!completed && address === owner && (
+                        <Button
+                          auto flat color="success" size="sm"
+                          css={{ borderRadius: "7px", minWidth: "70px" }}
+                          disabled={isBusy}
+                          onPress={async () => {
+                            setActionIdx(index);
+                            await settleRequestOf(campaignAddress, index);
+                            setTimeout(() => { setRefresh((p) => !p); setActionIdx(null); }, 4000);
+                          }}
+                        >
+                          {isBusy ? "..." : "Settle"}
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
   );
 };
 

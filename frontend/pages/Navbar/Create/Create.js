@@ -2,181 +2,241 @@ import React, { useState } from "react";
 import Navbar from "../Navbar";
 import styles from "./Create.module.css";
 import { useFactory } from "../../../context/CampaignFactory";
-import { Button, Spacer, Loading, Card } from "@nextui-org/react";
 import Link from "next/link";
 import axios from "axios";
 import { utils } from "ethers";
 
+const CATEGORIES = [
+  "Miscellaneous",
+  "Education",
+  "Health",
+  "Sports",
+  "Community support",
+  "Woman",
+];
+
+const TIME_UNITS = [
+  { value: "month",  label: "Months" },
+  { value: "week",   label: "Weeks"  },
+  { value: "day",    label: "Days"   },
+  { value: "hour",   label: "Hours"  },
+  { value: "minute", label: "Minutes"},
+];
+
 const Create = () => {
   const { registerYourProtocol } = useFactory();
-  const [pdf, setPdf] = useState(null);
+
+  const [form, setForm] = useState({
+    title: "", category: "Miscellaneous", target: "",
+    image: "", contribution: "", timeValue: "", timeUnit: "day",
+  });
+  const [pdf, setPdf]           = useState(null);
   const [uploaded, setUploaded] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const uploadToIpfs = async () => {
+    const file = document.getElementById("pdf").files[0];
+    if (!file) { alert("Please select a PDF first."); return; }
+    setUploading(true);
     try {
       const formData = new FormData();
-      formData.append("file", document.getElementById("pdf").files[0]);
-      const url = "https://api.pinata.cloud/pinning/pinFileToIPFS";
-      const resFile = await axios.post(url, formData, {
+      formData.append("file", file);
+      const res = await axios.post("https://api.pinata.cloud/pinning/pinFileToIPFS", formData, {
         headers: {
           pinata_api_key: "ca5199974ef2c2592db0",
           pinata_secret_api_key: "0643702204c4256e18ecb913ecaa7d55e0487128f9a12c7725c0af93b22b8ad9",
           "Content-Type": "multipart/form-data",
         },
       });
-      const pdfUrl = `https://gateway.pinata.cloud/ipfs/${resFile.data.IpfsHash}`;
-      setPdf(pdfUrl);
+      setPdf(`https://gateway.pinata.cloud/ipfs/${res.data.IpfsHash}`);
       setUploaded(true);
     } catch (e) {
       console.error(e);
-      alert("Error! while uploading file to IPFS....");
+      alert("Error uploading to IPFS.");
+    } finally {
+      setUploading(false);
     }
   };
 
-  const ExternalLink = ({ href, children }) => (
-    <Link href={href} passHref legacyBehavior>
-      <a target="_blank" rel="noopener noreferrer">{children}</a>
-    </Link>
-  );
-
-  const validation = async () => {
+  const handleSubmit = async () => {
     try {
-      const form = document.getElementById("form");
-      const title = form.title.value.trim();
-      const category = form.category.value;
-      const target = parseFloat(form.target.value);
-      const image = form.image.value.trim();
-      const contribution = parseFloat(form.mcontribution.value);
-      const file = form.file.files.length > 0;
-      const timeValue = parseFloat(form["time-value"].value);
-      const timeUnit = form["time-unit"].value;
+      const { title, category, target, image, contribution, timeValue, timeUnit } = form;
 
-      if (!title) throw new Error("Title is required");
-      if (!target || target <= 0) throw new Error("Target amount must be greater than 0");
-      if (!contribution || contribution <= 0) throw new Error("Minimum contribution must be greater than 0");
-      if (target < contribution) throw new Error("Target amount must be greater than the minimum contribution");
-      if (!image) throw new Error("Image link is required");
-      if (!file) throw new Error("PDF must be uploaded");
-      if (!timeValue || timeValue <= 0) throw new Error("Deadline must be greater than 0");
+      if (!title.trim())                        throw new Error("Title is required");
+      if (!target || parseFloat(target) <= 0)   throw new Error("Target amount must be greater than 0");
+      if (!contribution || parseFloat(contribution) <= 0) throw new Error("Minimum contribution must be greater than 0");
+      if (parseFloat(target) < parseFloat(contribution))  throw new Error("Target must be greater than minimum contribution");
+      if (!image.trim())                        throw new Error("Image link is required");
+      if (!uploaded || !pdf)                    throw new Error("Please upload a PDF document");
+      if (!timeValue || parseFloat(timeValue) <= 0) throw new Error("Deadline must be greater than 0");
 
-      let minutes = 0;
-      switch (timeUnit) {
-        case "month":
-          minutes = timeValue * 30 * 24 * 60;
-          break;
-        case "week":
-          minutes = timeValue * 7 * 24 * 60;
-          break;
-        case "day":
-          minutes = timeValue * 24 * 60;
-          break;
-        case "hour":
-          minutes = timeValue * 60;
-          break;
-        default:
-          minutes = timeValue;
-      }
+      const multipliers = { month: 30*24*60, week: 7*24*60, day: 24*60, hour: 60, minute: 1 };
+      const minutes = parseFloat(timeValue) * multipliers[timeUnit];
 
-      const formatedTarget = utils.parseEther(`${target}`);
-      const formatedMC = utils.parseEther(`${contribution}`);
-
-      const data = {
-        deadline: minutes,
-        target: formatedTarget,
-        contribution: formatedMC,
-        pdf: pdf,
-        category: category,
-        image: image,
-      };
-
-      await registerYourProtocol(data);
-    } catch (error) {
-      alert(error.message);
+      setSubmitting(true);
+      await registerYourProtocol({
+        deadline:     minutes,
+        target:       utils.parseEther(`${target}`),
+        contribution: utils.parseEther(`${contribution}`),
+        pdf,
+        category,
+        image,
+      });
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  const handleReset = () => {
+    setForm({ title: "", category: "Miscellaneous", target: "", image: "", contribution: "", timeValue: "", timeUnit: "day" });
+    setPdf(null);
+    setUploaded(false);
+    if (document.getElementById("pdf")) document.getElementById("pdf").value = "";
   };
 
   return (
-    <div>
+    <div className={styles.page}>
       <Navbar />
-      <br />
-      <Card
-        css={{
-          width: "500px",
-          padding: "30px",
-          height: "80%",
-          fontWeight: "bold",
-          marginLeft: "35%",
-        }}
-      >
-        <h2>Campaign Registration</h2>
-        <form name="reg_form" id="form" onSubmit={validation}>
-          <label>CATEGORY*</label>
-          <br />
-          <select id="category" name="category" className={styles.box}>
-            <option value="miscellaneous">Miscellaneous</option>
-            <option value="Education">Education</option>
-            <option value="Health">Health</option>
-            <option value="Sports">Sports</option>
-            <option value="Community support">Community support</option>
-            <option value="Woman">Woman</option>
-          </select>
-          <br /><br />
-          <label>TITLE*</label>
-          <br/>
-          <input type="text" placeholder="ABOUT DONATION" className={styles.box} name="title" />
-          <br /><br />
-          <label>Target(MATIC)*</label><br/>
-          <input type="number" placeholder="AMOUNT(MATIC)" className={styles.box} name="target" />
-          <br /><br />
-          <label>External Image Link*</label><br/>
-          <input type="text" className={styles.box} name="image" placeholder="IMAGE LINK" />
-          <br /><br />
-          <label>Minimum Contribution(MATIC)*</label><br/>
-          <input type="number" placeholder="(MATIC)" className={styles.box} name="mcontribution" />
-          <br /><br />
-          <label>Deadline*</label><br/>
-<div>
-  <label>
-    <input type="radio" name="time-unit" value="month" /> Months
-  </label>
-  <label>
-    <input type="radio" name="time-unit" value="week" /> Weeks
-  </label>
-  <label>
-    <input type="radio" name="time-unit" value="day" /> Days
-  </label>
-  <label>
-    <input type="radio" name="time-unit" value="hour" /> Hours
-  </label>
-  <label>
-    <input type="radio" name="time-unit" value="minute" /> Minutes
-  </label>
-</div>
 
-<label>Time value*</label>
-<input type="number" name="time-value" required />
-<br /><br />
+      <div className={styles.container}>
+        {/* Header */}
+        <div className={styles.header}>
+          <span className={styles.headerTag}>New Application</span>
+          <h1 className={styles.headerTitle}>Campaign Registration</h1>
+          <p className={styles.headerSub}>
+            Fill in the details below to register your fundraising campaign.
+            It will be reviewed by an authorizer before going live.
+          </p>
+        </div>
 
-          PDF UPLOAD*
-          <br/>
-          <input type="file" accept=".pdf" name="file" id="pdf" />
-          <br /><br/>
-          {uploaded ? (
-            <ExternalLink href={pdf}>
-              <p>Preview</p> <br/>
-            </ExternalLink>
-          ) : (
-            <Button auto onPress={uploadToIpfs} rounded>
-              Upload PDF
-            </Button>
-          )}
-          <br />
-          <Button shadow auto color="success" onPress={validation}>
-            Register
-          </Button>
-        </form>
-      </Card>
-      <br />
+        {/* Form */}
+        <div className={styles.formCard}>
+          <div className={styles.fields}>
+
+            {/* Category */}
+            <div className={styles.field}>
+              <label className={styles.label}>Category <span className={styles.req}>*</span></label>
+              <select name="category" className={styles.select} value={form.category} onChange={handleChange}>
+                {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            {/* Title */}
+            <div className={styles.field}>
+              <label className={styles.label}>Campaign Title <span className={styles.req}>*</span></label>
+              <input
+                className={styles.input} type="text" name="title"
+                placeholder="Brief description of your campaign"
+                value={form.title} onChange={handleChange}
+              />
+            </div>
+
+            {/* Target + Min Contribution */}
+            <div className={styles.row}>
+              <div className={styles.field}>
+                <label className={styles.label}>Target Amount (ETH) <span className={styles.req}>*</span></label>
+                <input
+                  className={styles.input} type="number" name="target"
+                  placeholder="0.00" value={form.target} onChange={handleChange}
+                />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Min. Contribution (ETH) <span className={styles.req}>*</span></label>
+                <input
+                  className={styles.input} type="number" name="contribution"
+                  placeholder="0.00" value={form.contribution} onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            {/* Image */}
+            <div className={styles.field}>
+              <label className={styles.label}>Campaign Image URL <span className={styles.req}>*</span></label>
+              <input
+                className={styles.input} type="text" name="image"
+                placeholder="https://..." value={form.image} onChange={handleChange}
+              />
+              {form.image && (
+                <img src={form.image} alt="preview" className={styles.imgPreview}
+                  onError={(e) => { e.target.style.display = "none"; }} />
+              )}
+            </div>
+
+            {/* Deadline */}
+            <div className={styles.field}>
+              <label className={styles.label}>Deadline <span className={styles.req}>*</span></label>
+              <div className={styles.deadlineRow}>
+                <input
+                  className={`${styles.input} ${styles.deadlineInput}`}
+                  type="number" name="timeValue"
+                  placeholder="e.g. 7" value={form.timeValue} onChange={handleChange}
+                />
+                <div className={styles.radioGroup}>
+                  {TIME_UNITS.map((u) => (
+                    <label key={u.value} className={`${styles.radioLabel} ${form.timeUnit === u.value ? styles.radioActive : ""}`}>
+                      <input
+                        type="radio" name="timeUnit" value={u.value}
+                        checked={form.timeUnit === u.value}
+                        onChange={handleChange}
+                        className={styles.radioInput}
+                      />
+                      {u.label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* PDF Upload */}
+            <div className={styles.field}>
+              <label className={styles.label}>
+                Supporting Document (PDF) <span className={styles.req}>*</span>
+              </label>
+              <p className={styles.hint}>Upload your proposal, project plan or supporting evidence.</p>
+              <div className={styles.uploadRow}>
+                <input type="file" accept=".pdf" id="pdf" name="file" className={styles.fileInput} />
+                <button
+                  type="button"
+                  className={`${styles.uploadBtn} ${uploaded ? styles.uploadedBtn : ""}`}
+                  onClick={uploadToIpfs}
+                  disabled={uploading || uploaded}
+                >
+                  {uploading ? "Uploading..." : uploaded ? "✓ Uploaded" : "Upload to IPFS"}
+                </button>
+              </div>
+              {uploaded && pdf && (
+                <Link href={pdf} passHref legacyBehavior>
+                  <a target="_blank" rel="noopener noreferrer" className={styles.previewLink}>
+                    Preview uploaded document →
+                  </a>
+                </Link>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className={styles.actions}>
+              <button
+                type="button" className={styles.submitBtn}
+                onClick={handleSubmit} disabled={submitting}
+              >
+                {submitting ? "Submitting..." : "Register Campaign"}
+              </button>
+              <button
+                type="button" className={styles.resetBtn}
+                onClick={handleReset}
+              >
+                Reset
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

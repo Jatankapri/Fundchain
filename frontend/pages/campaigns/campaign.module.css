@@ -1,79 +1,173 @@
-.navbar {
-  border: 1px solid none;
-  background: white;
-  height: 80px;
-  display: flex;
-  justify-content: space-around;
-  margin-top: -3%;
-  margin-left: -8%;
-}
+/* campaign.module.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Sans:wght@300;400;500&display=swap');
 
 .main {
-  background: whitesmoke;
+  min-height: 100vh;
+  background: #f8f7f4;
+  font-family: 'DM Sans', sans-serif;
+  padding-bottom: 80px;
 }
 
 .center {
-  margin-left: 7%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 24px;
 }
 
+/* ── Heading ── */
 .heading {
-  color: blue;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 28px;
+  text-align: center;
 }
 
-.line {
-  width: 50%;
-  margin-top: -39%;
-  border-top: 2px solid pink;
-}
-
-.font {
-  font-size: 18px;
-}
-
-.detail {
-  height: 500px;
-  background: white;
-  width: 850px;
-  border: 1px solid none;
-  box-shadow: 5px 10px 8px #888888;
-  padding: 20px;
-}
-
-.image {
-  margin-left: 120px;
-  margin-top: -42px;
-}
-
-.donationlog {
-  width: 700px;
-  border: 1px solid none;
-  padding: 20px;
-}
-
-.target {
-  padding: 8px;
-  font-weight: bold;
-  background: skyblue;
-  border: 1px solid none;
-  margin-top: -15px;
-  margin-left: 230px;
-}
-
+/* ── Side image card (mobile wallet) ── */
 .sidediv {
-  padding: 10px;
-  top: 12px;
-  height: 600px;
-  width: 30%;
-  margin-left: 55%;
+  width: 100%;
+  height: 280px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
 }
 
+/* ── Divider ── */
+.line {
+  width: 100%;
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 28px 0;
+}
+
+/* ── Info block ── */
+.font {
+  font-size: 0.95rem;
+  color: #374151;
+  line-height: 2;
+  font-weight: 400;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.font a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.font a:hover {
+  text-decoration: underline;
+}
+
+/* ── Target badge ── */
+.target {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #0f172a;
+  color: #f1f5f9;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 100px;
+  margin: 16px 0;
+  letter-spacing: 0.03em;
+}
+
+/* ── Verified badge row ── */
+.image {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+/* ── Donate form ── */
+.donateForm {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  margin: 24px 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.donateForm input[type="number"] {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+
+.donateForm input[type="number"]:focus {
+  border-color: #3b82f6;
+  background: #fff;
+}
+
+/* ── Your donation card ── */
 .donationdiv {
-  padding: 10px;
-  margin-left: 23%;
-  margin-top: -150px;
+  margin: 24px 0;
 }
 
 .donation {
-  padding: 8px;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #0f172a;
+  padding: 4px 0;
+}
+
+/* ── Log nav buttons ── */
+.navbar {
+  display: flex;
+  gap: 12px;
+  margin: 32px 0 20px;
+  background: transparent;
+  height: auto;
+  border: none;
+  justify-content: flex-start;
+}
+
+/* ── Log container ── */
+.log {
+  margin-top: 8px;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* ── Detail card ── */
+.detail {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  margin-bottom: 20px;
+}
+
+/* ── Donation log ── */
+.donationlog {
+  width: 100%;
+  padding: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .center { padding: 24px 16px; }
+  .heading { font-size: 1.6rem; }
+  .sidediv { height: 200px; }
+  .font { padding: 18px 20px; }
+  .navbar { flex-direction: column; }
 }

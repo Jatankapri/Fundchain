@@ -1,39 +1,191 @@
-.main{
-    padding:10px;
+/* styles/User.module.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&display=swap');
+
+.page {
+  min-height: 100vh;
+  background: #f8f7f4;
+  font-family: 'DM Sans', sans-serif;
+  padding-bottom: 80px;
 }
 
-.heading{
-    margin-left: 43%;
-    font-weight: bold;
-    font-size: 40px;
+/* ── Hero ── */
+.hero {
+  background: #0f172a;
+  padding: 80px 8% 88px;
+  position: relative;
+  overflow: hidden;
 }
 
-.body{
-   margin-left: 10%; 
-   font-size: x-large;
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 420px; height: 420px;
+  background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%);
+  pointer-events: none;
 }
 
-.image{
-    border:1px solid black;
+.heroTag {
+  display: inline-block;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 100px;
+  margin-bottom: 22px;
 }
 
-.paragraph{
-    font-size: x-large;
+.heroTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.5rem, 5.5vw, 4.5rem);
+  font-weight: 900;
+  color: #f1f5f9;
+  line-height: 1.1;
+  margin: 0 0 18px;
 }
 
-.donate{
-    display: flex;
-    justify-content: space-between;
+.heroAccent {
+  color: #3b82f6;
+  font-style: italic;
 }
 
-.sideInfo{
-    margin-left: 20px;
-    font-size: x-large;
-    margin-right: 5%;
+.heroSub {
+  font-size: 1rem;
+  color: #94a3b8;
+  max-width: 500px;
+  line-height: 1.75;
+  font-weight: 300;
+  margin: 0;
 }
 
-.line{
-    margin-top: 2%;
-    border:1px solid grey;
-  
+/* ── Sections ── */
+.section {
+  padding: 60px 8% 0;
+}
+
+.sectionLabel {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin: 0 0 28px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* ── Roles ── */
+.rolesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.roleCard {
+  border-radius: 14px;
+  padding: 28px 24px;
+  transition: transform 0.2s;
+}
+
+.roleCard:hover { transform: translateY(-3px); }
+
+.roleIcon { font-size: 1.8rem; display: block; margin-bottom: 14px; }
+
+.roleTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin: 0 0 10px;
+}
+
+.roleDesc {
+  font-size: 0.86rem;
+  color: #94a3b8;
+  line-height: 1.7;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* ── Steps ── */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stepCard {
+  background: var(--bg);
+  border-radius: 14px;
+  padding: 28px 32px;
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  border-left: 4px solid var(--accent);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stepCard:hover {
+  transform: translateX(5px);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.07);
+}
+
+.stepNum {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0.2;
+  min-width: 58px;
+  flex-shrink: 0;
+}
+
+.stepBody { flex: 1; padding-top: 2px; }
+
+.stepTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 14px;
+}
+
+.stepList {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stepList li {
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+/* ── Footer ── */
+.footerNote {
+  margin: 60px 8% 0;
+  padding: 18px 24px;
+  background: #0f172a;
+  border-radius: 10px;
+  color: #475569;
+  font-size: 0.82rem;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero { padding: 56px 6% 64px; }
+  .section { padding: 44px 6% 0; }
+  .rolesGrid { grid-template-columns: 1fr; gap: 10px; }
+  .stepCard { flex-direction: column; gap: 12px; padding: 22px 20px; }
+  .stepNum { font-size: 1.8rem; }
+  .footerNote { margin: 44px 6% 0; }
 }

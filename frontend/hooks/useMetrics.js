@@ -54,10 +54,10 @@ async function calculateMetrics(provider) {
   ] = await Promise.all([
     factory.queryFilter("RegisteredProtocol"),
     factory.queryFilter("CreatedTender"),
-    factory.queryFilter(ethers.utils.id("RoleGranted(bytes32,address,address)")),
-    factory.queryFilter(ethers.utils.id("RoleRevoked(bytes32,address,address)")),
-    factory.queryFilter("ProtocolValidated"),
-    factory.queryFilter("ProtocolRejected").catch(() => []), // safe fallback if not deployed yet
+    (async () => { try { return await factory.queryFilter(ethers.utils.id("RoleGranted(bytes32,address,address)")); } catch { return []; } })(),
+    (async () => { try { return await factory.queryFilter(ethers.utils.id("RoleRevoked(bytes32,address,address)")); } catch { return []; } })(),
+    (async () => { try { return await factory.queryFilter("ProtocolValidated"); } catch { return []; } })(),
+    (async () => { try { return await factory.queryFilter("ProtocolRejected"); } catch { return []; } })()
   ]);
 
   const contractReadLatency = Date.now() - t0; // ms

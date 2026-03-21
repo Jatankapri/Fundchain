@@ -4,41 +4,35 @@ import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import styles from "../styles/Admin.module.css";
 import { useFactory } from "../context/CampaignFactory";
-import { Button, Input, Spacer, Text, Table, Grid } from "@nextui-org/react";
+import { Button, Input } from "@nextui-org/react";
 
 const Admin = () => {
   const { grantRole, revokeRole, getAuthorizersCurrentRoles } = useFactory();
   const inputRef = useRef();
   const [authorizers, setAuthorizers] = useState([]);
-  const [reRender, setRender] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [reRender, setRender]         = useState(false);
+  const [isLoading, setIsLoading]     = useState(false);
   const router = useRouter();
 
   const fetchData = async () => {
     try {
-      const authorizersData = await getAuthorizersCurrentRoles();
-      setAuthorizers(authorizersData);
-    } catch (error) {
-      console.error("Error fetching authorizers:", error);
+      const data = await getAuthorizersCurrentRoles();
+      setAuthorizers(data);
+    } catch (e) {
+      console.error("Error fetching authorizers:", e);
     }
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [reRender]);
+  useEffect(() => { fetchData(); }, [reRender]);
 
-  const grantedList = authorizers.filter(auth => auth.role === "granted").map(auth => auth.address);
-  const revokedList = authorizers.filter(auth => auth.role === "revoked").map(auth => auth.address);
-
-  const maxLength = Math.max(grantedList.length, revokedList.length);
+  const grantedList = authorizers.filter(a => a.role === "granted").map(a => a.address);
+  const revokedList = authorizers.filter(a => a.role === "revoked").map(a => a.address);
+  const maxLength   = Math.max(grantedList.length, revokedList.length);
   const paddedGranted = [...grantedList, ...Array(maxLength - grantedList.length).fill("")];
   const paddedRevoked = [...revokedList, ...Array(maxLength - revokedList.length).fill("")];
 
   const checkInput = () => {
-    if (inputRef.current.value.length === 0) {
-      alert('Please provide account!');
-      return false;
-    }
+    if (!inputRef.current.value.length) { alert("Please provide an account address!"); return false; }
     return true;
   };
 
@@ -47,11 +41,8 @@ const Admin = () => {
     setIsLoading(true);
     try {
       await grantRole(inputRef.current.value);
-      setTimeout(() => { setRender(prev => !prev); setIsLoading(false); }, 2000);
-    } catch {
-      alert("Unable to grant the role");
-      setIsLoading(false);
-    }
+      setTimeout(() => { setRender(p => !p); setIsLoading(false); }, 2000);
+    } catch { alert("Unable to grant the role"); setIsLoading(false); }
   }
 
   async function revokeRoleFor() {
@@ -59,103 +50,112 @@ const Admin = () => {
     setIsLoading(true);
     try {
       await revokeRole(inputRef.current.value);
-      setTimeout(() => { setRender(prev => !prev); setIsLoading(false); }, 2000);
-    } catch {
-      alert("Unable to revoke the role");
-      setIsLoading(false);
-    }
+      setTimeout(() => { setRender(p => !p); setIsLoading(false); }, 2000);
+    } catch { alert("Unable to revoke the role"); setIsLoading(false); }
   }
 
   return (
-    <>
-      <div className={styles.navbar}>
-        <div style={{ marginLeft: "-12%" }}>
-          <Image src={"/navBarLogo.png"} height={150} width={400} quality={100} alt="logo" priority />
+    <div className={styles.page}>
+
+      {/* ── Navbar ── */}
+      <nav className={styles.navbar}>
+        <div className={styles.navLogo}>
+          <Image src={"/navBarLogo.png"} height={110} width={300} quality={100} alt="logo" priority />
         </div>
-        <font className={styles.heading}>ADMIN PAGE</font>
-        <div className={styles.option} style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          {/* ── Metrics Button ── */}
-          <button
-            onClick={() => router.push("/Metrics")}
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              padding: "10px 20px",
-              fontSize: "14px",
-              fontWeight: "600",
-              cursor: "pointer",
-              letterSpacing: "0.04em",
-              whiteSpace: "nowrap",
-            }}
-          >
+        <span className={styles.navTitle}>Admin Panel</span>
+        <div className={styles.navRight}>
+          <button className={styles.metricsBtn} onClick={() => router.push("/Metrics")}>
             📊 View Metrics
           </button>
           <Web3Button />
         </div>
+      </nav>
+
+      {/* ── Hero ── */}
+      <div className={styles.hero}>
+        <div className={styles.heroInner}>
+          <span className={styles.heroTag}>Administrator</span>
+          <h1 className={styles.heroTitle}>Role Access Control</h1>
+          <p className={styles.heroSub}>
+            Grant or revoke authorizer roles to manage who can verify campaign applications.
+          </p>
+        </div>
       </div>
 
-      <div style={{ padding: "30px", fontSize: "24px" }}>
-        <Grid.Container gap={3} justify="space-between">
-          {/* Input Form Section */}
-          <Grid xs={12} sm={5} css={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <Text b css={{ fontSize: "18px" }}>ROLE ACCESS CONTROL</Text>
-            <Spacer y="0.5" />
-            <form>
-              <Input
-                rounded
-                bordered
-                label="Account Address"
-                placeholder="0x00...."
-                color="secondary"
+      {/* ── Main content ── */}
+      <div className={styles.container}>
+        <div className={styles.grid}>
+
+          {/* ── Input form ── */}
+          <div className={styles.formCard}>
+            <h2 className={styles.cardTitle}>Manage Roles</h2>
+            <p className={styles.cardSub}>Enter a wallet address to grant or revoke the Authorizer role.</p>
+
+            <div className={styles.inputWrap}>
+              <label className={styles.label}>Wallet Address</label>
+              <input
                 ref={inputRef}
-                css={{ fontSize: "14px" }}
+                type="text"
+                placeholder="0x..."
+                className={styles.input}
               />
-              <Spacer y={1} />
-              <Button.Group color="gradient" ghost size="xl" css={{ marginLeft: "-6px" }}>
-                <Button onPress={grantRoleFor} css={{ fontSize: "14px" }} disabled={isLoading}>Grant</Button>
-                <Button onPress={revokeRoleFor} css={{ fontSize: "14px" }} disabled={isLoading}>Revoke</Button>
-              </Button.Group>
-            </form>
-          </Grid>
+            </div>
 
-          {/* Table Section */}
-          <Grid xs={12} sm={7}>
-            <Table
-              bordered
-              shadow
-              color="secondary"
-              aria-label="Authorizers table"
-              css={{
-                borderCollapse: "separate",
-                borderSpacing: "20px 15px",
-                minWidth: "100%",
-                fontSize: "14px",
-                width: "100%",
-              }}
-            >
-              <Table.Header>
-                <Table.Column><b>Granted</b></Table.Column>
-                <Table.Column><b>Revoked</b></Table.Column>
-              </Table.Header>
-              <Table.Body>
-                {paddedGranted.map((granted, index) => (
-                  <Table.Row key={index}>
-                    <Table.Cell css={{ padding: "15px 20px", wordWrap: "break-word", maxWidth: "600px" }}>
-                      {granted || ""}
-                    </Table.Cell>
-                    <Table.Cell css={{ padding: "15px 20px", wordWrap: "break-word", maxWidth: "600px" }}>
-                      {paddedRevoked[index] || ""}
-                    </Table.Cell>
-                  </Table.Row>
-                ))}
-              </Table.Body>
-            </Table>
-          </Grid>
-        </Grid.Container>
+            <div className={styles.btnRow}>
+              <button
+                className={styles.grantBtn}
+                onClick={grantRoleFor}
+                disabled={isLoading}
+              >
+                {isLoading ? "Processing..." : "Grant Role"}
+              </button>
+              <button
+                className={styles.revokeBtn}
+                onClick={revokeRoleFor}
+                disabled={isLoading}
+              >
+                {isLoading ? "Processing..." : "Revoke Role"}
+              </button>
+            </div>
+          </div>
+
+          {/* ── Table ── */}
+          <div className={styles.tableCard}>
+            <div className={styles.tableHeader}>
+              <h2 className={styles.cardTitle}>Authorizer Registry</h2>
+              <span className={styles.count}>{grantedList.length} active</span>
+            </div>
+
+            {maxLength === 0 ? (
+              <div className={styles.empty}>
+                <span>👥</span>
+                <p>No authorizers assigned yet.</p>
+              </div>
+            ) : (
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>Granted</th>
+                      <th>Revoked</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paddedGranted.map((granted, i) => (
+                      <tr key={i}>
+                        <td className={styles.addrGranted}>{granted || "—"}</td>
+                        <td className={styles.addrRevoked}>{paddedRevoked[i] || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

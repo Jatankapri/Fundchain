@@ -6,47 +6,55 @@ import Image from "next/image";
 import { useAccount, useProvider } from "wagmi";
 import { useRouter } from "next/router";
 import { getFactoryContract } from "../hooks/useContract";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const { address, isConnected } = useAccount();
-  const provider = useProvider();
-  const router = useRouter();
+  const provider  = useProvider();
+  const router    = useRouter();
+  const [checking, setChecking] = useState(false);
 
   async function getRole() {
+    // Only run when wallet is fully connected
+    if (!isConnected || !address || !provider) return;
+    if (checking) return;
+
+    setChecking(true);
     try {
-      if (isConnected && address && provider) {
-        const FactoryContract = getFactoryContract(provider);
+      const FactoryContract = getFactoryContract(provider);
+      if (!FactoryContract) return;
 
-        // Check if connected address is the admin
-        const adminAddress = await FactoryContract.admin();
-        console.log("admin:", adminAddress);
-        console.log("connected:", address);
+      const adminAddress = await FactoryContract.admin();
+      console.log("admin:", adminAddress);
+      console.log("connected:", address);
 
-        if (adminAddress.toLowerCase() === address.toLowerCase()) {
-          router.push(`/Admin`);
-          return;
-        }
+      if (adminAddress.toLowerCase() === address.toLowerCase()) {
+        router.push(`/Admin`);
+        return;
+      }
 
-        // Check authorizer role from mapping
-        const role = await FactoryContract.authoirzerRoles(address);
-        console.log("role:", role);
+      const role = await FactoryContract.authoirzerRoles(address);
+      console.log("role:", role);
 
-        if (role === "granted") {
-          router.push(`/Authorizer`);
-        } else {
-          router.push(`/User`);
-        }
+      if (role === "granted") {
+        router.push(`/Authorizer`);
+      } else {
+        router.push(`/User`);
       }
     } catch (error) {
-      console.log("getRole error:", error);
-      router.push(`/User`);
+      console.log("getRole error:", error.message);
+      // Only redirect if wallet is genuinely connected
+      if (isConnected && address) {
+        router.push(`/User`);
+      }
+    } finally {
+      setChecking(false);
     }
   }
 
   useEffect(() => {
     getRole();
-  }, [address, isConnected, provider]);
+  }, [address, isConnected]); // only re-run when wallet state changes
 
   return (
     <div className={styles.container}>
@@ -64,6 +72,11 @@ export default function Home() {
         <div className={styles.button}>
           <Web3Button />
         </div>
+        {checking && (
+          <p style={{ color: "#94a3b8", fontSize: "0.85rem", marginTop: "12px" }}>
+            Detecting your role...
+          </p>
+        )}
       </div>
     </div>
   );
